@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="{{ page.lang | default: site.lang | default: "en" }}">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gibberish-aes/1.0.0/gibberish-aes.min.js"></script>
+
+  {% include head.html %}
+
+  <body>
+
+    {% include header.html %}
+
+    <main class="page-content" aria-label="Content">
+      <div id="inject" class="wrapper">
+         <!-- {{ content }}  -->
+      </div>
+    </main>
+
+    {% include footer.html %}
+
+  </body>
+
+  <script>
+    var encryptedContent = 'REPLACEMEENCRYPT({{ content | jsonify }})';
+
+    // For development
+    if (encryptedContent.includes('REPLACEMEENCRYPT')) {
+      var injectionElement = document.getElementById('inject');
+      var injectionContent = encryptedContent
+        .replace('REPLACEMEENCRYPT("', '')
+        .replace(/.$/, '') // Replace last character which is a '
+        .replace(/.$/, '') // Replace next last character which is a )
+        .replace(/.$/, ''); // Replace next last character which is a "
+      injectionElement.innerHTML = injectionContent;
+
+    }
+
+
+  </script>
+
+</html>
