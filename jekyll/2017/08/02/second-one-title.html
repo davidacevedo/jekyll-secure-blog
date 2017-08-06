@@ -1,15 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gibberish-aes/1.0.0/gibberish-aes.min.js"></script>
+
   <head>
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Example Blog</title>
-  <meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search resu...">
+  <title>Second Post</title>
+  <meta name="description" content="This is an example of a post it can be writting in markdown or the liquid markup language.">
 
   <link rel="stylesheet" href="/jekyll-secure-blog/assets/main.css">
-  <link rel="canonical" href="/jekyll-secure-blog/404.html">
+  <link rel="canonical" href="/jekyll-secure-blog/jekyll/2017/08/02/second-one-title.html">
   <link rel="alternate" type="application/rss+xml" title="Example Blog" href="/jekyll-secure-blog/feed.xml">
   
   
@@ -64,29 +66,18 @@
 </header>
 
     <main class="page-content" aria-label="Content">
-      <div class="wrapper">
-         <style type="text/css" media="screen">
-  .container {
-    margin: 10px auto;
-    max-width: 600px;
-    text-align: center;
-  }
-  h1 {
-    margin: 30px 0;
-    font-size: 4em;
-    line-height: 1;
-    letter-spacing: -1px;
-  }
-</style>
-
-<div class="container">
-  <h1>404</h1>
-
-  <p><strong>Page not found :(</strong></p>
-  <p>The requested page could not be found.</p>
-</div>
- 
+      <div id="inject" class="wrapper">
+         
       </div>
+      <form id="myspecialform" style="display: none">
+            First name:<br>
+            <input type="text" name="key">
+            <br>
+            Last name:<br>
+            <input type="text" name="value">
+            <br><br>
+            <input type="submit" value="Submit">
+        </form>
     </main>
 
     <footer class="site-footer">
@@ -141,5 +132,57 @@
 
 
   </body>
+
+  <script>
+    var form = document.getElementById('myspecialform');
+    form.addEventListener('submit', mySubmitFunction);
+    function mySubmitFunction(e) {
+      e.preventDefault();
+      checkAndVerifyContent(e.target['key'].value, e.target['value'].value);
+    }
+
+
+    function decryptAndReturnContent(key, value) {
+      if (encryptedContent.includes('REPLACEMEENCRYPT')) {
+        var injectionContent = encryptedContent
+          .replace('REPLACEMEENCRYPT("', '')
+          .replace(/.$/, '') // Replace last character which is a '
+          .replace(/.$/, '') // Replace next last character which is a )
+          .replace(/.$/, ''); // Replace next last character which is a "
+    
+        return injectionContent;
+      } else if (key && value) {
+        return GibberishAES.dec(encryptedContent, key + value);
+      } else {
+        return '';
+      }
+    }
+
+    function checkAndVerifyContent(key, value) {
+      var injectionElement = document.getElementById('inject');
+      var form = document.getElementById('myspecialform');
+      try {
+        var content = decryptAndReturnContent(key, value, injectionElement);
+        if(!content.length) {
+          injectionElement.innerHTML = 'Authentication required';
+          form.style.display = 'block';
+        } else {
+          injectionElement.innerHTML = content.replace(/\\"/g, ''); // Replace all escaped strings
+          form.style.display = 'none';
+        }
+      } catch(e) {
+        injectionElement.innerHTML = 'Incorrect';
+        form.style.display = 'block';
+      }
+    } 
+
+    var encryptedContent = "U2FsdGVkX19gm+lgP6R4wfsThvxQE6WVyWr2CuRHTLiWKGg7tLbVhJHSHzaGbus2\nl7wRUs+bOrX7bT7SoHmYnpYNmenjxff2sUxx+Vhs2QVyBDi/qq+KHl7tV2YtnKin\nWTHnUCg5Dk3VrhaLlW1JmNmtpD+sTqeFRcPnqi5MpgIKb9XPt+89XxXnXyoad9pA\nk5Y9W5s17y37VYleeU+TdiVTAv1VHQHOtpuqmVGo+9zJcrDHswtZ0411snGYTeRE\naT2kHi+ITkTfk8YZVF4AOMYOq1kDEjtDMuWOosq7OXU6JuS2JEAdrw+RzMFSDKrC\nLLv+jfZNv5r2B6TPKPL1NkN8tmEK0bWJQXOzHWMkWY78mSKmzUicYrpggteJKHVp\nk88kmZJsAZjflsNuIuZK0eLY6A5RfQPXWZYtUQdBoOtAd4UTZLltcremT2FVas3h\nlmVQUFpcVUI2B7g7WF+du3HW5zSKxpH2CANMKmFza2ym2oVCEJdNVHIx80MS816v\nRWaFin5HZmkTNZNND3oyQ3qFJEHXiaPTWsfSF2db+g3VjNt22Ii+LRymvcdPMr+Z\nKoXs1Xuh3LoDY8IDIXorQzwgZaix/5zRtYQPPM+df+do4yQ1QpN/RcxpTq5ecKUH\nWEpeK70Cv2pR7BhkKp5hAHn1RoNJivG63E9HUazo+5TwCIAfJS0KdDLTNQw7vOA5\nFqM1AMyscq8ROvgH5GUuV/qdYNYD8dn+xod2QCI2ueSiAhiqs7YknBarnRJA++uX\nn4ctc2wcErYTnNQDwwBTsg==";
+    
+    var key = sessionStorage.getItem('decryptkey');
+    var value = sessionStorage.getItem('decryptvalue');
+
+    checkAndVerifyContent(key, value);
+
+  </script>
 
 </html>
