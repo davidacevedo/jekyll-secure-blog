@@ -8,7 +8,7 @@ const encryptContent = (content, key, value) => gibberishAES.enc(content, key + 
 
 const readFile = (file) => {
   console.log(`Opening file ${file}`)
-  const html = fs.readFileSync(file, 'utf-8');
+  const html = fs.readFileSync(file).toString();
   
   if (!html.includes('REPLACEMEENCRYPT(')) {
     console.log(`Did not encrypt ${file}\n`);
@@ -19,7 +19,10 @@ const readFile = (file) => {
     .replace(/.$/, '') // Replace last character which is a '
     .replace(/.$/, '') // Replace next last character which is a )
     .replace(/.$/, '') // Replace next last character which is a "
-    .replace('REPLACEMEENCRYPT("', '');
+    .replace('\'REPLACEMEENCRYPT("', '')
+    .replace(/\\n/g, ""); // Remove all \n
+
+  console.log(contentToEncrypt);
 
   encryptedContent = JSON.stringify(encryptContent(contentToEncrypt, key, value));
   const finalContent = splitHtml.join(encryptedContent);
